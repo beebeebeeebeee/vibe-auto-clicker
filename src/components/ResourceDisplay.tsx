@@ -52,7 +52,7 @@ export default function ResourceDisplay() {
                 </button>
                 {particles.map((particle, idx) => (
                     <ClickParticle
-                        key={particle.id}
+                        key={idx}
                         x={particle.x}
                         y={particle.y}
                         value={BigInt(resources.coins.perClick)}

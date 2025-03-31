@@ -11,6 +11,16 @@ export interface UpgradeState {
     level: number;
 }
 
+export interface Upgrade {
+    id: string;
+    name: string;
+    baseCost: bigint;
+    level: number;
+    multiplier: bigint;
+    type: 'click' | 'auto';
+    description: string;
+}
+
 // This represents the configuration of an upgrade (static data)
 export interface UpgradeConfig {
     id: string;

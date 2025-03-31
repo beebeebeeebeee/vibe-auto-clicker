@@ -22,7 +22,6 @@ const getProfitText = (
     id: string, 
     level: number,
     currentPerClick: string,
-    currentPerSecond: string
 ): string => {
     const multiplierBigInt = BigInt(multiplier);
     if (type === 'click') {
@@ -100,8 +99,7 @@ export default function UpgradeShop() {
                         upgradeConfig.multiplier, 
                         upgradeConfig.id,
                         upgradeState.level,
-                        resources.coins.perClick,
-                        resources.coins.perSecond
+                        resources.coins.perClick
                     );
                     
                     return (
