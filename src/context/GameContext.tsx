@@ -15,62 +15,62 @@ type GameAction =
 const initialState: GameState = {
     resources: {
         name: 'Coins',
-        amount: 0,
-        perClick: 1,
-        perSecond: 0
+        amount: '0',
+        perClick: '1',
+        perSecond: '0'
     },
     upgrades: [
         {
             id: 'click1',
             name: 'Better Clicking',
-            baseCost: 10,
+            baseCost: BigInt(10),
             level: 0,
-            multiplier: 1,
+            multiplier: BigInt(1),
             type: 'click',
             description: 'Adds +1 coin per click'
         },
         {
             id: 'click2',
             name: 'Power Click',
-            baseCost: 50,
+            baseCost: BigInt(50),
             level: 0,
-            multiplier: 2,
+            multiplier: BigInt(2),
             type: 'click',
             description: 'Multiplies click value by 2'
         },
         {
             id: 'auto1',
             name: 'Auto Collector',
-            baseCost: 25,
+            baseCost: BigInt(25),
             level: 0,
-            multiplier: 0.5,
+            multiplier: BigInt(1),
             type: 'auto',
-            description: 'Generates 0.5 coins per second'
+            description: 'Generates 1 coin per second'
         },
         {
             id: 'auto2',
             name: 'Coin Factory',
-            baseCost: 100,
+            baseCost: BigInt(100),
             level: 0,
-            multiplier: 2,
-            type: 'auto',
-            description: 'Generates 2 coins per second'
-        },
-        {
-            id: 'auto3',
-            name: 'Mining Rig',
-            baseCost: 250,
-            level: 0,
-            multiplier: 5,
+            multiplier: BigInt(5),
             type: 'auto',
             description: 'Generates 5 coins per second'
         },
         {
+            id: 'auto3',
+            name: 'Mining Rig',
+            baseCost: BigInt(250),
+            level: 0,
+            multiplier: BigInt(25),
+            type: 'auto',
+            description: 'Generates 25 coins per second'
+        },
+        {
             id: 'click3',
             name: 'Golden Touch',
-            baseCost: 500,
+            baseCost: BigInt(500),
             level: 0,
-            multiplier: 5,
+            multiplier: BigInt(5),
             type: 'click',
             description: 'Multiplies click value by 5'
         }
@@ -79,8 +79,10 @@ const initialState: GameState = {
 };
 
 // Helper function to calculate upgrade cost based on level
-const calculateUpgradeCost = (baseCost: number, level: number): number => {
-    return Math.floor(baseCost * Math.pow(1.5, level));
+const calculateUpgradeCost = (baseCost: bigint, level: number): bigint => {
+    // Convert the multiplier to BigInt after calculation to maintain precision
+    const multiplier = BigInt(Math.round(Math.pow(1.5, level) * 1000)) / BigInt(1000);
+    return baseCost * multiplier;
 };
 
 const GameContext = createContext<{
@@ -98,32 +100,37 @@ function gameReducer(state: GameState, action: GameAction): GameState {
                     amount: state.resources.amount + state.resources.perClick
                 }
             };
-        case 'TICK':
+        case 'TICK': {
             const now = Date.now();
             const deltaTime = (now - state.lastTick) / 1000;
+            // Convert deltaTime to BigInt with millisecond precision
+            const deltaTimeMs = BigInt(Math.round(deltaTime * 1000));
+            const deltaCoins = (BigInt(state.resources.perSecond) * deltaTimeMs) / BigInt(1000);
+            
             return {
                 ...state,
                 lastTick: now,
                 resources: {
                     ...state.resources,
-                    amount: state.resources.amount + state.resources.perSecond * deltaTime
+                    amount: state.resources.amount + deltaCoins
                 }
             };
+        }
         case 'BUY_UPGRADE': {
             const upgrade = state.upgrades.find(u => u.id === action.upgradeId);
             if (!upgrade) return state;
 
             const cost = calculateUpgradeCost(upgrade.baseCost, upgrade.level);
-            if (state.resources.amount < cost) return state;
-
+            if (BigInt(state.resources.amount) < cost) return state;
+            
             const newState = {
                 ...state,
                 resources: {
                     ...state.resources,
-                    amount: state.resources.amount - cost
+                    amount: (BigInt(state.resources.amount) - cost).toString()
                 },
                 upgrades: state.upgrades.map(u =>
-                    u.id === action.upgradeId
+                    u.id === action.upgradeId 
                         ? { ...u, level: u.level + 1 }
                         : u
                 )
@@ -136,10 +143,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
                     newState.resources.perClick += upgrade.multiplier;
                 } else {
                     // Multiplicative bonus
-                    newState.resources.perClick *= upgrade.multiplier;
+                    newState.resources.perClick = (BigInt(newState.resources.perClick) * upgrade.multiplier).toString();
                 }
             } else if (upgrade.type === 'auto') {
-                newState.resources.perSecond += upgrade.multiplier;
+                newState.resources.perSecond = (BigInt(newState.resources.perSecond) + upgrade.multiplier).toString();
             }
 
             return newState;

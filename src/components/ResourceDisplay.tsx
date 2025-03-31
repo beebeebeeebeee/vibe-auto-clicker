@@ -1,26 +1,30 @@
-import { useState } from 'react';
-import { useGame } from '../context/GameContext';
+import { useState, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store/store';
+import { click } from '../store/gameSlice';
 import Player from './Player';
 import ClickParticle from './ClickParticle';
 import { getAssetPath } from '../utils/assetUtils';
+import { formatNumber } from '../utils/numberFormat';
 
 export default function ResourceDisplay() {
-    const { state, dispatch } = useGame();
-    const { resources } = state;
+    const dispatch = useDispatch();
+    const { resources } = useSelector((state: RootState) => state.game);
     const [isClicking, setIsClicking] = useState(false);
-    const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
-    let particleId = 0;
+    const [particles, setParticles] = useState<Array<{ id: string; x: number; y: number }>>([]);
+    const particleIdRef = useRef(0);
 
     const handleClick = (e: React.MouseEvent) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        dispatch({ type: 'CLICK' });
+        dispatch(click());
         setIsClicking(true);
         
-        // Add particle
-        setParticles(prev => [...prev, { id: particleId++, x, y }]);
+        // Generate a unique ID for each particle
+        const particleId = `particle-${Date.now()}-${particleIdRef.current++}`;
+        setParticles(prev => [...prev, { id: particleId, x, y }]);
         
         setTimeout(() => setIsClicking(false), 100);
     };
@@ -28,14 +32,14 @@ export default function ResourceDisplay() {
     return (
         <div className="resource-display">
             <h2 className="resource-amount">
-                {Math.floor(resources.amount).toLocaleString()} {resources.name}
+                {formatNumber(BigInt(resources.coins.amount))} {resources.coins.name}
             </h2>
             <div className="resource-stats">
                 <div className="stat-item">
-                    <span>Per Click: {resources.perClick.toLocaleString()}</span>
+                    <span>Per Click: {formatNumber(BigInt(resources.coins.perClick))}</span>
                 </div>
                 <div className="stat-item">
-                    <span>Per Second: {resources.perSecond.toLocaleString()}</span>
+                    <span>Per Second: {formatNumber(BigInt(resources.coins.perSecond))}</span>
                 </div>
             </div>
             <div className="game-area">
@@ -46,12 +50,12 @@ export default function ResourceDisplay() {
                 >
                     <img src={getAssetPath('click-target.svg')} alt="Click Target" />
                 </button>
-                {particles.map(particle => (
+                {particles.map((particle, idx) => (
                     <ClickParticle
                         key={particle.id}
                         x={particle.x}
                         y={particle.y}
-                        value={resources.perClick}
+                        value={BigInt(resources.coins.perClick)}
                         onComplete={() => setParticles(prev => prev.filter(p => p.id !== particle.id))}
                     />
                 ))}

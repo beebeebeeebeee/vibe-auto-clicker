@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
-import { useGame } from '../context/GameContext';
+import { useDispatch } from 'react-redux';
+import { tick } from '../store/gameSlice';
 import ResourceDisplay from './ResourceDisplay';
 import UpgradeShop from './UpgradeShop';
 import { getAssetPath } from '../utils/assetUtils';
 
 export default function Game() {
-    const { dispatch } = useGame();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const timer = setInterval(() => {
-            dispatch({ type: 'TICK' });
-        }, 100); // Update every 100ms
+            dispatch(tick());
+        }, 1000); // Update every 100ms
 
         // Set background image
         document.documentElement.style.setProperty(

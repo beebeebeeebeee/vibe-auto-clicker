@@ -1,7 +1,9 @@
+import { formatNumber } from '../utils/numberFormat';
+
 interface ClickParticleProps {
     x: number;
     y: number;
-    value: number;
+    value: bigint;
     onComplete: () => void;
 }
 
@@ -12,7 +14,7 @@ export default function ClickParticle({ x, y, value, onComplete }: ClickParticle
             style={{ left: x, top: y }}
             onAnimationEnd={onComplete}
         >
-            +{value}
+            +{formatNumber(value)}
         </div>
     );
 } 

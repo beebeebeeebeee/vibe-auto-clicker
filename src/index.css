@@ -87,7 +87,7 @@ body {
   background: var(--surface-color);
   border-radius: 16px;
   padding: 20px;
-  flex: 1;
+  position: relative;
 }
 
 .upgrade-shop h2 {
@@ -98,64 +98,18 @@ body {
 
 .upgrades-list {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 4px;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 4px 12px 4px;
+  margin: 0 -4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-.upgrade-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  transition: background-color 0.2s;
-}
-
-.upgrade-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.upgrade-info {
-  flex: 1;
-  text-align: left;
-}
-
-.upgrade-info h3 {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--text-primary);
-}
-
-.upgrade-info p {
-  margin: 4px 0 0 0;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.upgrade-item button {
-  background: var(--accent-color);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: opacity 0.2s;
-}
-
-.upgrade-item button:disabled {
-  background: var(--danger-color);
-  opacity: 0.5;
-}
-
-/* Custom scrollbar */
+/* Custom scrollbar styles */
 .upgrades-list::-webkit-scrollbar {
-  width: 8px;
+  height: 8px;
+  display: block;
 }
 
 .upgrades-list::-webkit-scrollbar-track {
@@ -166,6 +120,110 @@ body {
 .upgrades-list::-webkit-scrollbar-thumb {
   background: var(--primary-color);
   border-radius: 4px;
+}
+
+.upgrades-list::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+
+/* Firefox scrollbar */
+.upgrades-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) rgba(255, 255, 255, 0.05);
+}
+
+.upgrade-item {
+  flex: 0 0 auto;
+  width: 120px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  scroll-snap-align: start;
+}
+
+.upgrade-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.upgrade-level {
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.upgrade-icon {
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upgrade-name {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: center;
+  font-weight: 500;
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+}
+
+.upgrade-button {
+  width: 100%;
+  padding: 8px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upgrade-button:disabled {
+  background: var(--danger-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upgrade-button:hover:not(:disabled) {
+  background: var(--primary-color);
+}
+
+.upgrade-tooltip {
+  position: fixed;
+  background: var(--surface-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  max-width: 200px;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: tooltip-fade-in 0.2s ease-out;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -313,4 +371,15 @@ input, textarea {
     color: var(--accent-color);
     font-size: 0.8rem;
     margin-top: 4px;
+}
+
+.upgrade-profit {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin-bottom: 4px;
+    min-height: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
